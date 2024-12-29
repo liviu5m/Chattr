@@ -2,20 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+* {
+  transition-duration: .25s;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.scroll-remove {
+  overflow: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.transparent-input {
+  background-color: transparent; 
+  border: none;                  
+  outline: none;                 
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+.transparent-input:focus {
+  outline: none !important;       
+  border: none !important;        
+  box-shadow: none !important;    
+  -webkit-box-shadow: none;       
+  -moz-box-shadow: none;          
 }
+
+.transparent-input:focus-visible {
+  outline: none !important;       
+}
+
+.transparent-input:active {
+  outline: none !important;       
+}
+

@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String      @id
+  username     String      @unique
+  email        String      @unique
+  name         String
+  birthDate    String?
+  gender       String?
+  bio          String?
+  phone        String?
+  website      String?
+  address      String?
+  profilePhoto String?
+  coverPhoto   String?
+  follower     Followers[] @relation("followerUser")
+  following    Followers[] @relation("followingUser")
+  posts        Post[]
+  createdAt    DateTime    @default(now())
+  Like         Like[]
+  Comment      Comment[]
+}
+
+model Followers {
+  id          Int      @id @default(autoincrement())
+  follower    User     @relation("followerUser", fields: [followerId], references: [id], onDelete: Cascade)
+  followerId  String
+  following   User     @relation("followingUser", fields: [followingId], references: [id], onDelete: Cascade)
+  followingId String
+  createdAt   DateTime @default(now())
+}
+
+model Post {
+  id        Int       @id @default(autoincrement())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  content   String
+  url       String?
+  createdAt DateTime  @default(now())
+  Like      Like[]
+  Comment   Comment[]
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int
+  createdAt DateTime @default(now())
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int
+  createdAt DateTime @default(now())
+}
