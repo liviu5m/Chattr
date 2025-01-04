@@ -17,6 +17,7 @@ export default function Discover() {
         setVal={setSearch}
         label="Search People"
         icon={faSearch}
+        id="search"
       />
       <div className="grid grid-cols-2 mt-10 gap-8">
         <UserCard />

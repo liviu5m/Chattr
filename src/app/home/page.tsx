@@ -20,14 +20,17 @@ export default function Home() {
   useEffect(() => {
     localStorage.setItem("page", page);
   }, [page]);
+  console.log(page);
 
   return (
-    <div className="justify-center w-[900px] mx-auto flex h-screen max-w-screen-sm md:max-w-screen-lg">
-      <Sidebar page={page} setPage={setPage} />
-      <div className="w-full md:w-[65%] my-10 overflow-scroll scroll-remove mx-auto">
-        {page == "feed" && <Feed />}
-        {page == "discover" && <Discover />}
-        {page == "profile" && <Profile />}
+    <div className="h-screen overflow-scroll scroll-remove">
+      <div className="justify-center w-[900px] mx-auto flex h-screen max-w-screen-sm md:max-w-screen-lg">
+        <Sidebar page={page} setPage={setPage} />
+        <div className="w-full md:w-[65%] my-10 mx-auto">
+          {page == "feed" && <Feed />}
+          {page == "discover" && <Discover />}
+          {page == "profile" && <Profile />}
+        </div>
       </div>
     </div>
   );

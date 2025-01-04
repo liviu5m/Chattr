@@ -2,8 +2,16 @@ import React, { useState } from "react";
 import ProfilePosts from "./ProfilePosts";
 import ProfilePhotos from "./ProfilePhotos";
 import ProfileAbout from "./ProfileAbout";
+import { User } from "@prisma/client";
 
-export default function ProfilePages() {
+interface DbUser extends User {
+  _count: {
+    follower: number;
+    following: number;
+  }
+}
+
+export default function ProfilePages({ user }: { user: DbUser }) {
 
   const [page, setPage] = useState("posts");
 
@@ -16,7 +24,7 @@ export default function ProfilePages() {
       </ul>
       {page == "posts" && <ProfilePosts />}
       {page == "photos" && <ProfilePhotos />}
-      {page == "about" && <ProfileAbout />}
+      {page == "about" && <ProfileAbout user={user} />}
     </div>
   );
 }

@@ -22,7 +22,7 @@ export default function Sidebar({
   setPage: (page: string) => void;
 }) {
   return (
-    <div className="left-0 fixed bottom-0 md:relative md:bottom-auto md:w-[30%] w-full bg-slate-900/90 py-5 md:py-0">
+    <div className="left-0 fixed bottom-0 xl:left-[15%] 2xl:left-[20%] lg:left-[10%] md:left-[5%] md:w-fit md:top-0 md:bottom-auto w-full bg-slate-900/90 py-5 md:py-0 z-50">
       <div className="w-full flex justify-center gap-[10px] md:justify-between md:h-screen md:flex-col ">
         <div>
           <h1 className="text-blue-500 text-3xl my-10 font-bold px-5 md:block hidden">

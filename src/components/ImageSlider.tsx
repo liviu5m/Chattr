@@ -1,67 +1,75 @@
+import React, { useCallback } from "react";
+import useEmblaCarousel from "embla-carousel-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowLeft,
   faArrowRight,
   faX,
 } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useEffect, useState } from "react";
 
-export default function ImageSlider({
+const Carousel = ({
+  slides,
   setIsOpenModal,
 }: {
-  setIsOpenModal: (isOpen: boolean) => void;
-}) {
-  const [current, setCurrent] = useState(0);
+  slides: string[];
+  setIsOpenModal: (e: boolean) => void;
+}) => {
+  const [emblaRef, embla] = useEmblaCarousel({ loop: true });
 
-  let previousSlide = () => {
-    if (current === 0) setCurrent(slides.length - 1);
-    else setCurrent(current - 1);
-  };
+  const scrollNext = useCallback(() => {
+    if (embla) embla.scrollNext();
+  }, [embla]);
 
-  let nextSlide = () => {
-    if (current === slides.length - 1) setCurrent(0);
-    else setCurrent(current + 1);
-  };
-
-  let slides = [
-    "https://i.pinimg.com/originals/51/82/ac/5182ac536727d576c78a9320ac62de30.jpg",
-    "https://wallpapercave.com/wp/wp3386769.jpg",
-    "https://wallpaperaccess.com/full/809523.jpg",
-    "https://getwallpapers.com/wallpaper/full/5/c/0/606489.jpg",
-  ];
+  const scrollPrev = useCallback(() => {
+    if (embla) embla.scrollPrev();
+  }, [embla]);
 
   return (
-    <div className="absolute z-10 w-screen h-screen top-0 left-0 backdrop-blur-sm">
+    <div className="absolute top-1/2 left-1/2 z-30 -translate-x-1/2 -translate-y-1/2 w-full h-full">
+      <div className="absolute inset-0 backdrop-blur-sm"></div>
       <div className="flex items-center justify-center h-full">
-        <div
-          className="absolute top-3 right-3 rounded-full w-10 h-10 cursor-pointer bg-gray-500 opacity-50 text-lg flex items-center justify-center z-20"
-          onClick={() => setIsOpenModal(false)}
-        >
-          <FontAwesomeIcon icon={faX} />
-        </div>
-
-        <div className="overflow-hidden w-1/2 h-1/2">
-          <div
-            className={`flex transition ease-out duration-40`}
-            style={{
-              transform: `translateX(-${current * 100}%)`,
-            }}
-          >
-            {slides.map((s,i) => {
-              return <img src={s} key={i} />;
-            })}
-          </div>
-
-          <div className="absolute top-0 left-0 h-full w-full justify-between items-center flex text-white px-10 text-3xl">
-            <button onClick={previousSlide}>
+        <div className="w-full relative z-40">
+          <div className="relative w-full overflow-hidden">
+            <div className="w-full overflow-hidden" ref={emblaRef}>
+              <div className="flex">
+                {slides.map((slide, index) => (
+                  <div
+                    key={index}
+                    className="relative flex items-center justify-center w-full p-4"
+                    style={{ flex: "0 0 100%" }}
+                  >
+                    <img
+                      src={slide}
+                      alt={`Slide ${index + 1}`}
+                      className="rounded-lg w-[40%] h-auto object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <button
+              className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-gray-800 text-white rounded-full w-10 h-10 hover:bg-gray-700 focus:outline-none"
+              onClick={scrollPrev}
+            >
               <FontAwesomeIcon icon={faArrowLeft} />
             </button>
-            <button onClick={nextSlide}>
+            <button
+              className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-gray-800 text-white rounded-full w-10 h-10 hover:bg-gray-700 focus:outline-none"
+              onClick={scrollNext}
+            >
               <FontAwesomeIcon icon={faArrowRight} />
             </button>
           </div>
+          <button
+            className="absolute top-0 right-5 bg-gray-800 text-white rounded-full w-10 h-10 hover:bg-gray-700 focus:outline-none"
+            onClick={() => setIsOpenModal(false)}
+          >
+            <FontAwesomeIcon icon={faX} />
+          </button>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default Carousel;
