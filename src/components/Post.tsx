@@ -13,6 +13,9 @@ import PostComments from "./PostComments";
 import { comment } from "postcss";
 import { gsap } from "gsap";
 import { timeAgo } from "@/lib/functions";
+import Loader from "./Loader";
+import Link from "next/link";
+import SmallLoader from "./SmallLoader";
 
 interface Posts extends PostType {
   logged: boolean;
@@ -72,13 +75,10 @@ export default function Post({
       .get("/api/user/" + post.userId)
       .then((res) => {
         setUser(res.data);
-        setLoading(false);
       })
       .catch((err) => {
         console.log(err);
-        setLoading(false);
       });
-    setLoading(true);
     axios
       .put("/api/like", {
         postId: post.id,
@@ -142,9 +142,10 @@ export default function Post({
       });
   };
 
-  return (
-    isVisible &&
-    post && (
+  return loading ? (
+    <SmallLoader />
+  ) : (
+    isVisible && post && (
       <div className="rounded-lg px-8 py-4  bg-blue-500/50 md:max-w-screen-lg">
         <div className="flex items-start justify-between mb-5">
           <div className="flex items-start gap-5">
@@ -154,10 +155,23 @@ export default function Post({
                 alt=""
                 width={50}
                 height={50}
+                className="aspect-square rounded-full"
               />
             </div>
             <div>
-              <h2 className="text-lg font-bold">{user?.name}</h2>
+              <h2
+                onClick={() => {
+                  console.log(post.logged);
+
+                  if (post.logged) {
+                    localStorage.setItem("page", "profile");
+                    window.location.href = "/home";
+                  } else window.location.href = "/profile/" + user?.username;
+                }}
+                className="text-lg border-b cursor-pointer border-blue-500/50 hover:border-b hover:border-blue-500 font-bold duration-0"
+              >
+                {user?.name}
+              </h2>
               <p className="text-gray-400 font-medium">
                 {timeAgo(post.createdAt)}
               </p>

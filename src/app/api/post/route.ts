@@ -30,7 +30,31 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    const { searchParams } = new URL(request.url);
+    const type = searchParams.get("type") || "";
+    const userId = searchParams.get("userId") || "";
+    const { userId: userAuth } = await auth();
+    
+    if (type == "userId") {
+      const posts = await prisma.post.findMany({
+        where: {
+          userId: (userId != "-1" ? userId : userAuth) || ""
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        include: {
+          _count: {
+            select: {
+              Comment: true,
+              Like: true,
+            },
+          },
+        },
+      });
+      return NextResponse.json(posts);
+    }
+
     let posts = await prisma.post.findMany({
       orderBy: {
         createdAt: "desc",

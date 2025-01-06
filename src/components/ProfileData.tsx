@@ -19,12 +19,12 @@ export default function ProfileData({ user }: { user: DbUser }) {
       </h2>
       <div className="flex items-center gap-5">
         <h1>
-          <b>{user._count.follower} </b>
+          <b>{user._count.following} </b>
           Followers
         </h1>
         <span className="text-3xl">·</span>
         <h1>
-          <b>{user._count.following} </b>
+          <b>{user._count.follower} </b>
           Following
         </h1>
       </div>

@@ -4,6 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { User } from "@prisma/client";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { log } from "util";
+import { serialize } from "v8";
 
 interface DbUser extends User {
   _count: {
@@ -16,6 +18,8 @@ export default function ProfileImages({ user }: { user: DbUser }) {
   const [file, setFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState(user.profilePhoto);
   const [coverUrl, setCoverUrl] = useState(user.coverPhoto);
+  const [loggedUser, setLoggedUser] = useState(false);
+  const [following, setFollowing] = useState(false);
 
   const handleFileChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -67,6 +71,43 @@ export default function ProfileImages({ user }: { user: DbUser }) {
     }
   };
 
+  useEffect(() => {
+    axios
+      .get("/api/user/" + user.id, {
+        params: {
+          type: "loggedUser",
+        },
+      })
+      .then((res) => {
+        if (res.data) setLoggedUser(true);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    axios
+      .get("/api/follower/" + user.id)
+      .then((res) => {
+        if (res.data) setFollowing(true);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
+  const follow = () => {
+    setFollowing(!following);
+    axios
+      .put("/api/follower", {
+        followingId: user.id,
+      })
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   return (
     <div>
       <div
@@ -77,18 +118,20 @@ export default function ProfileImages({ user }: { user: DbUser }) {
           backgroundImage: `url(${coverUrl})`,
         }}
       >
-        <label htmlFor="coverImage">
-          <div className="absolute bottom-3 right-3 w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
-            <FontAwesomeIcon icon={faImage} />
-          </div>
-          <input
-            type="file"
-            id="coverImage"
-            onChange={(e) => handleFileChange(e, "coverPhoto")}
-            className="hidden"
-            accept="image/*"
-          />
-        </label>
+        {loggedUser && (
+          <label htmlFor="coverImage">
+            <div className="absolute bottom-3 right-3 w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
+              <FontAwesomeIcon icon={faImage} />
+            </div>
+            <input
+              type="file"
+              id="coverImage"
+              onChange={(e) => handleFileChange(e, "coverPhoto")}
+              className="hidden"
+              accept="image/*"
+            />
+          </label>
+        )}
       </div>
       <div className="flex items-center justify-between">
         <div
@@ -97,25 +140,38 @@ export default function ProfileImages({ user }: { user: DbUser }) {
             backgroundImage: `url(${imageUrl})`,
           }}
         >
-          <label htmlFor="profileImage">
-            <div className="absolute bottom-3 right-3 w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center cursor-pointer">
-              <FontAwesomeIcon icon={faCamera} />
-            </div>
-            <input
-              type="file"
-              id="profileImage"
-              onChange={(e) => handleFileChange(e, "profilePhoto")}
-              className="hidden"
-              accept="image/*"
-            />
-          </label>
+          {loggedUser && (
+            <label htmlFor="profileImage">
+              <div className="absolute bottom-3 right-3 w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center cursor-pointer">
+                <FontAwesomeIcon icon={faCamera} />
+              </div>
+              <input
+                type="file"
+                id="profileImage"
+                onChange={(e) => handleFileChange(e, "profilePhoto")}
+                className="hidden"
+                accept="image/*"
+              />
+            </label>
+          )}
         </div>
-        <a
-          href="/edit-profile"
-          className="px-7 py-4 rounded-3xl border-2 border-blue-500 text-blue-500 -mt-10 hover:bg-blue-500 hover:text-white"
-        >
-          Edit Profile
-        </a>
+        {loggedUser ? (
+          <a
+            href="/edit-profile"
+            className="px-7 py-4 rounded-3xl font-bold border-2 border-blue-500 text-blue-500 -mt-10 hover:bg-blue-500 hover:text-white"
+          >
+            Edit Profile
+          </a>
+        ) : (
+          <h1
+            onClick={() => follow()}
+            className={`px-7 cursor-pointer py-4 font-bold rounded-3xl border-2 border-blue-500 text-blue-500 -mt-10 hover:text-white ${
+              following ? "bg-blue-500 text-white" : "hover:bg-blue-500"
+            }`}
+          >
+            {following ? "Following" : "Follow"}
+          </h1>
+        )}
       </div>
     </div>
   );

@@ -6,8 +6,8 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get("type") || "";
+    const { userId } = await auth();
     if (type == "registeredUser") {
-      const { userId } = await auth();
       if (userId) {
         const user = await prisma.user.findFirst({
           where: {
@@ -24,6 +24,31 @@ export async function GET(request: NextRequest) {
         });
         return NextResponse.json(user);
       } else return NextResponse.json("no user");
+    }else if(type == "allUser") {
+    const search = searchParams.get("search") || "";
+    const user = await prisma.user.findMany({
+      where: {
+        OR: [
+          { username: { contains: search } },
+          { name: { contains: search } },
+        ],
+        AND: [
+          { id: { not: userId || ""} }
+        ],
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        _count: {
+          select: {
+            follower: true,
+            following: true,
+          },
+        },
+      },
+    });
+      return NextResponse.json(user);
     }
   } catch (err) {
     return NextResponse.json(err);
